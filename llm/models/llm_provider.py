@@ -150,9 +150,9 @@ class LLMProvider(models.Model):
             )
         return ""
 
-    def embedding(self, texts, model=None):
+    def embedding(self, texts, model=None, usage="document"):
         """Generate embeddings using this provider"""
-        return self._dispatch("embedding", texts, model=model)
+        return self._dispatch("embedding", texts, model=model, usage=usage)
 
     def generate(self, input_data, model=None, stream=False, **kwargs):
         """Generate content using this provider

@@ -121,7 +121,7 @@ class LLMResource(models.Model):
 
                 # Case 1: Handle ir.attachment with type 'url'
                 if res_model == "ir.attachment" and hasattr(record, "type"):
-                    if record.type == "url" and hasattr(record, "url"):
+                    if record.type in ["url", "binary"] and hasattr(record, "url"):
                         return record.url
 
                 # Case 2: Check if record has an external_url field

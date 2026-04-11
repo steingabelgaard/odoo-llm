@@ -224,7 +224,7 @@ class LLMKnowledgeChunk(models.Model):
         for model in embedding_models:
             try:
                 model_vector_map[model.id] = model.embedding(
-                    vector_search_term.strip()
+                    vector_search_term.strip(), usage="query"
                 )[0]
             except Exception:
                 # Remove collections using this failed model
@@ -387,3 +387,21 @@ class LLMKnowledgeChunk(models.Model):
         similarities = [res[0] for res in final_results]
         similarity_scores = dict(zip(chunk_ids, similarities))  # noqa: B905
         return self.browse(chunk_ids).with_context(similarity_scores=similarity_scores)
+
+    def show_resource(self):
+        """Action to show the parent resource of this chunk."""
+        self.ensure_one()
+        if self.resource_id.external_url:
+            return {
+                "type": "ir.actions.act_url",
+                "url": self.resource_id.external_url,
+                "target": "new",
+            }
+        else:
+            return {
+                "type": "ir.actions.act_window",
+                "res_model": self.resource_id.model_id.model,
+                "res_id": self.resource_id.res_id,
+                "view_mode": "form",
+                "target": "current",
+        }

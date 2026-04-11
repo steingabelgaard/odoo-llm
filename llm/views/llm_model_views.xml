@@ -42,6 +42,8 @@
                             <field name="publisher_id" />
                             <field name="model_use" />
                             <field name="default" />
+                            <field name="task_instruction_prefix_document" widget="text" />
+                            <field name="task_instruction_prefix_query" widget="text" />
                         </group>
                         <group>
                             <field name="details" widget="json_editor" />

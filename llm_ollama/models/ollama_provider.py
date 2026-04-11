@@ -23,7 +23,10 @@ class LLMProvider(models.Model):
 
     def ollama_get_client(self):
         """Get Ollama client instance"""
-        return ollama.Client(host=self.api_base or "http://localhost:11434")
+        headers = {}
+        if self.api_key:
+            headers["Authorization"] = "Bearer " + self.api_key
+        return ollama.Client(host=self.api_base or "http://localhost:11434", headers=headers)
 
     def ollama_normalize_prepend_messages(self, prepend_messages):
         """Normalize prepend_messages for Ollama format.
@@ -330,7 +333,7 @@ class LLMProvider(models.Model):
         )
         return assembled_tool_calls
 
-    def ollama_embedding(self, texts, model=None):
+    def ollama_embedding(self, texts, model=None, usage="document"):
         """Generate embeddings using Ollama"""
         model = self.get_model(model, "embedding")
 
@@ -338,10 +341,17 @@ class LLMProvider(models.Model):
         if isinstance(texts, str):
             texts = [texts]
 
+        task_instruction = ""
+        if usage == "document":
+            task_instruction = model.task_instruction_prefix_document or ""
+        elif usage == "query":
+            task_instruction = model.task_instruction_prefix_query or ""
+        if task_instruction:
+            task_instruction += " "
         # Get embeddings for each text
         embeddings = []
         for text in texts:
-            response = self.client.embed(model=model.name, input=[text])
+            response = self.client.embed(model=model.name, input=[task_instruction + text])
             embeddings.append(response["embeddings"][0])
         return embeddings
 
@@ -385,7 +395,7 @@ class LLMProvider(models.Model):
 
         return model_info
 
-    def ollama_format_messages(self, messages, system_prompt=None):
+    def ollama_format_messages(self, messages, system_prompt=None, model=None):
         """Format messages for Ollama API
 
         Args:

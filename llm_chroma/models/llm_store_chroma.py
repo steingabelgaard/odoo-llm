@@ -42,11 +42,11 @@ class LLMStoreChroma(models.Model):
 
         # Extract host and port
         host = parsed_uri.hostname or "localhost"
-        port = parsed_uri.port or 8000
+        port = parsed_uri.port or 443 if ssl else 8000
 
         # Create and return the HTTP client
-        headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else None
-
+        headers = {"Authorization": f"Basic {self.api_key}"} if self.api_key else None
+        _logger.info('CHROMA CONNECT: %s:%s (ssl=%s) %s', host, port, ssl, headers)
         try:
             client = chromadb.HttpClient(host=host, port=port, ssl=ssl, headers=headers)
             # Test connection

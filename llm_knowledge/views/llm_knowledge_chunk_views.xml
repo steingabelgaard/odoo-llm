@@ -8,6 +8,7 @@
             <list>
                 <field name="name" />
                 <field name="resource_id" />
+                <button name="show_resource" string="Show Resource" type="object" />
                 <field name="sequence" widget="handle" />
                 <field name="collection_ids" widget="many2many_tags" />
             </list>
