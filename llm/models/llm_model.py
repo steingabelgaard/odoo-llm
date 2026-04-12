@@ -29,6 +29,8 @@ class LLMModel(models.Model):
     model_info = fields.Json()
     parameters = fields.Text()
     template = fields.Text()
+    task_instruction_prefix_document = fields.Text()
+    task_instruction_prefix_query = fields.Text()
 
     @api.model
     def _get_available_model_usages(self):
@@ -61,9 +63,9 @@ class LLMModel(models.Model):
         """Send chat messages using this model"""
         return self.provider_id.chat(messages, model=self, stream=stream, **kwargs)
 
-    def embedding(self, texts):
+    def embedding(self, texts, usage="document"):
         """Generate embeddings using this model"""
-        return self.provider_id.embedding(texts, model=self)
+        return self.provider_id.embedding(texts, model=self, usage=usage)
 
     def generate(self, input_data, stream=False, **kwargs):
         """Generate content using this model
